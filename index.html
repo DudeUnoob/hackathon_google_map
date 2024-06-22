@@ -20,7 +20,7 @@
     <div id="map"></div>
     <button onclick="createNewMarker()">Create a New Marker</button>
     <button onclick="removeLastMarker()">Remove Last Marker</button>
-
+    <button onclick="clearAllMarkers()">Clear All Markers</button>
     <script>
       let map;
       let infoWindow;
@@ -84,6 +84,11 @@
         } else {
           console.log("No markers to remove");
         }
+      }
+      function clearAllMarkers(){
+        markers.forEach(marker => marker.map = null);
+        markers = [];
+        console.log("All markers have been cleared");
       }
 
       function updateInfoWindow(marker) {
