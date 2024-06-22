@@ -1,0 +1,40 @@
+<html>
+
+<head>
+    <title>Logged In</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="/public/loggedin.css">
+</head>
+
+<body>
+    <div class="404-msg">
+    </div>
+    <div class="head">
+        <h1>Oops looks like you're <i style="font-weight: 500;text-decoration:underline;">logged in...</i>😁</h1>
+        <p>Go to</p>
+
+    </div>
+    <div class="redirect">
+        <!-- <a href="/login">Login</a> -->
+        <button type="button" id="post-btn">Home</button>
+    </div>
+</body>
+<script>
+    const button = document.getElementById("post-btn");
+
+    button.addEventListener('click', () => {
+        window.location.href = '/'
+    })
+</script>
+<style>
+
+
+</style>
+
+</html>

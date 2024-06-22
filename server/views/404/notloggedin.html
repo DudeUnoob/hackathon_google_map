@@ -1,0 +1,63 @@
+<html>
+
+<head>
+    <title>Not Logged In</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="/public/notloggedin.css">
+</head>
+
+<body>
+    <div class="404-msg">
+    </div>
+    <div class="head">
+        <h1>Oops looks like you're <i style="text-decoration:underline;font-weight:500;">not logged in...</i>😁</h1>
+        <p>Go to</p>
+
+    </div>
+    <div class="redirect">
+        <!-- <a href="/login">Login</a> -->
+        <button type="button" id="post-btn">Login</button>
+    </div>
+</body>
+<script>
+
+
+    // fetch('/randomid')
+    // .then((response) => response.json())
+    // .then((data) => {
+    //     //randomid = data.id
+    //     randomid = data.id
+
+
+    // })
+
+
+
+    window.localStorage.setItem('redirectRoute', '/mydocuments')
+    const button = document.getElementById("post-btn");
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ route: window.localStorage.getItem('redirectRoute') })
+    };
+    button.addEventListener('click', () => {
+
+        fetch('/redirectdocument', requestOptions)
+            .then(response => response.json())
+            .then(data => console.log(data));
+        window.location.href = '/login'
+
+    });
+</script>
+<style>
+
+
+</style>
+
+</html>
