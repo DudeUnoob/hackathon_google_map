@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Add and Remove Markers</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <style>
+      #map {
+        height: 400px;
+        width: 100%;
+      }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>My Google Maps Demo</h3>
+    <div id="map"></div>
+    <button onclick="createNewMarker()">Create a New Marker</button>
+    <button onclick="removeLastMarker()">Remove Last Marker</button>
+
+    <script>
+      let map;
+      let infoWindow;
+      let markers = [];
+
+      async function initMap() {
+        const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+        
+        map = new Map(document.getElementById("map"), {
+          center: { lat: 37.39094933041195, lng: -122.02503913145092 },
+          zoom: 14,
+          mapId: "4504f8b37365c3d0",
+        });
+        
+        infoWindow = new InfoWindow();
+        
+        const initialMarker = new AdvancedMarkerElement({
+          map,
+          position: { lat: 37.39094933041195, lng: -122.02503913145092 },
+          gmpDraggable: true,
+          title: "Initial marker",
+        });
+
+        markers.push(initialMarker);
+
+        initialMarker.addListener("dragend", (event) => {
+          updateInfoWindow(initialMarker);
+        });
+      }
+
+      async function createNewMarker() {
+        if (!map) {
+          console.error("Map not initialized");
+          return;
+        }
+
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+        const newMarker = new AdvancedMarkerElement({
+          map,
+          position: { lat: 37.7870889413597, lng: -122.42503913145092 },
+          gmpDraggable: true,
+          title: "New draggable marker",
+        });
+
+        markers.push(newMarker);
+
+        newMarker.addListener("dragend", (event) => {
+          updateInfoWindow(newMarker);
+        });
+
+        map.panTo(newMarker.position);
+      }
+
+      function removeLastMarker() {
+        if (markers.length > 0) {
+          const lastMarker = markers.pop();
+          lastMarker.map = null; // This removes the marker from the map
+          console.log("Marker removed. Remaining markers:", markers.length);
+        } else {
+          console.log("No markers to remove");
+        }
+      }
+
+      function updateInfoWindow(marker) {
+        const position = marker.position;
+        infoWindow.close();
+        infoWindow.setContent(`Pin dropped at: ${position.lat}, ${position.lng}`);
+        infoWindow.open(marker.map, marker);
+      }
+
+      initMap();
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=API_KEY&callback=initMap"></script>
+  </body>
+</html>
