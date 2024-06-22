@@ -14,6 +14,7 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs')
 const { v4: uuidV4 } = require('uuid');
 const  checkLogin  = require('./middleware/checklogin')
+const continueFlow = require("./middleware/continueFlow")
 dotenv.config();
 
 app.use(express.json())
@@ -129,9 +130,16 @@ app.get('/logout', auth, (req, res) => {
  })
 
 
- app.get('/api/updateMarkers', checkLogin, async(req, res) => {
+ app.post('/api/updateMarkers', continueFlow, async(req, res) => {
     try {
+        //req.session.userid = username;
 
+        let latitude= req.body.markers[0].lat
+        let longitude = req.body.markers[0].lng 
+
+         await markersdb.create({ username: req.session.userid, lat: latitude, lng: longitude })
+
+        return res.status(200).json({ message: "Successfully created a new marker entry" })
     }
 
     catch(error) {
