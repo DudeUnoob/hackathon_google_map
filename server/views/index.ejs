@@ -20,6 +20,7 @@
     <div id="map"></div>
     <button onclick="createNewMarker()">Create a New Marker</button>
     <button onclick="removeLastMarker()">Remove Last Marker</button>
+    <button onclick="clearAllMarkers()">Clear All Markers</button>
 
     <script>
       let map;
@@ -48,6 +49,9 @@
         markers.push(initialMarker);
 
         initialMarker.addListener("dragend", (event) => {
+          console.log(markers)
+
+          fetch("/api/")
           updateInfoWindow(initialMarker);
         });
       }
@@ -70,6 +74,7 @@
         markers.push(newMarker);
 
         newMarker.addListener("dragend", (event) => {
+          console.log(markers)
           updateInfoWindow(newMarker);
         });
 

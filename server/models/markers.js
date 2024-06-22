@@ -7,10 +7,9 @@ mongoose.connect(databaseConnectionString).then(() => {
 
 const Schema = new mongoose.Schema({
     username:String,
-    password: String,
-    picture: String,
-    name: String,
+    lat: Number,
+    lng: Number
     
 })
 
-module.exports = mongoose.model('Hackathon_Users', Schema)
+module.exports = mongoose.model('Hackathon_Markers', Schema)

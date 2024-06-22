@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser")
 const jwt = require('jsonwebtoken')
 const auth = require('./middleware/auth')
 const userdb = require('./models/userdb');
+const markersdb = require("./models/markers")
 const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs')
 const { v4: uuidV4 } = require('uuid');
@@ -127,6 +128,16 @@ app.get('/logout', auth, (req, res) => {
      res.send('<a href=/>Successfully logged out</a>')
  })
 
+
+ app.get('/api/updateMarkers', checkLogin, async(req, res) => {
+    try {
+
+    }
+
+    catch(error) {
+        return res.status(500).json({ message: error, code: 500 })
+    }
+ })
 
 app.listen(process.env.PORT || 3000, () => {
     console.log("Server listening on port 3000")
