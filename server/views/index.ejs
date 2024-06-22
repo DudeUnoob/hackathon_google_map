@@ -49,37 +49,74 @@
         markers.push(initialMarker);
 
         initialMarker.addListener("dragend", (event) => {
-          console.log(markers)
+  const position = initialMarker.position;
+  console.log(`Marker moved to: ${position.lat}, ${position.lng}`);
 
-          fetch("/api/")
-          updateInfoWindow(initialMarker);
-        });
+  fetch("/api/updateMarkers", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      markers: [{lat: position.lat, lng: position.lng}]
+    })
+  }).then(res => res.json())
+    .then(data => console.log(data))
+
+  updateInfoWindow(initialMarker);
+});
       }
 
       async function createNewMarker() {
-        if (!map) {
-          console.error("Map not initialized");
-          return;
-        }
+  if (!map) {
+    console.error("Map not initialized");
+    return;
+  }
 
-        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-        const newMarker = new AdvancedMarkerElement({
-          map,
-          position: { lat: 37.7870889413597, lng: -122.42503913145092 },
-          gmpDraggable: true,
-          title: "New draggable marker",
-        });
+  const newMarker = new AdvancedMarkerElement({
+    map,
+    position: { lat: 37.7870889413597, lng: -122.42503913145092 },
+    gmpDraggable: true,
+    title: "New draggable marker",
+  });
 
-        markers.push(newMarker);
+  markers.push(newMarker);
 
-        newMarker.addListener("dragend", (event) => {
-          console.log(markers)
-          updateInfoWindow(newMarker);
-        });
+  // Add event listener for dragend
+  newMarker.addListener("dragend", (event) => {
+    const position = newMarker.position;
+    console.log(`Marker moved to: ${position.lat}, ${position.lng}`);
 
-        map.panTo(newMarker.position);
-      }
+    updateMarkerPosition(newMarker);
+  });
+
+  // Call the fetch function when a new marker is created
+  updateMarkerPosition(newMarker);
+
+  map.panTo(newMarker.position);
+}
+
+// Create a separate function to update marker position
+function updateMarkerPosition(marker) {
+  const position = marker.position;
+
+  fetch("/api/updateMarkers", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      markers: [{lat: position.lat, lng: position.lng}]
+    })
+  })
+  .then(res => res.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Error:', error));
+
+  updateInfoWindow(marker);
+}
 
       function removeLastMarker() {
         if (markers.length > 0) {
