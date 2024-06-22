@@ -129,8 +129,8 @@
     console.log(data);
 
     if (data.marker) {
-        newMarker.set('data', data.marker);
-    }
+    newMarker.userData = data.marker;
+}
 
     markers.push(newMarker);
     map.panTo(newMarker.position);
@@ -153,8 +153,8 @@ function updateMarkerPosition(marker, username) {
         console.log(data);
         // Update the marker's data if it's a new marker
         if (data.marker) {
-            marker.set('data', data.marker);
-        }
+    marker.userData = data.marker;
+}
     })
     .catch(error => console.error('Error:', error));
 
