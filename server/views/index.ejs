@@ -86,6 +86,12 @@
         }
       }
 
+      function clearAllMarkers(){
+        markers.forEach(marker => marker.map = null);
+        markers = [];
+        console.log("All markers have been cleared");
+      }
+
       function updateInfoWindow(marker) {
         const position = marker.position;
         infoWindow.close();

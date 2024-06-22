@@ -9,7 +9,11 @@ const Schema = new mongoose.Schema({
     username:String,
     password: String,
     picture: String,
-    name: String
+    name: String,
+    markers: {
+        lat: Number,
+        lng: Number
+    }
 })
 
 module.exports = mongoose.model('Hackathon_Users', Schema)

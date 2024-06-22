@@ -32,6 +32,10 @@ app.set('view engine', 'ejs')
 
 
 app.get("/", async(req, res) => {
+    if(!req.session.userid){
+        return res.redirect('/login')
+    }
+
     res.render("index")
 })
 
@@ -48,38 +52,41 @@ app.get('/login', checkLogin,(req, res) => {
 
 let finalUsername;
 
-app.post('/login', async(req, res) => {
-    const username = req.body.username;
-    const password = req.body.password;
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
 
-    let checkUser = await userdb.findOne({ username: username }).distinct('password')
-    //function to compare password
-    bcrypt.compare(password, checkUser[0], function(err, result) {
-        //if statement to check if inputted password equals to the password stored in the database
-        if(result == true){
-            let token = jwt.sign(
+    try {
+        const user = await userdb.findOne({ username: username });
+        
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid username or password' });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (isPasswordValid) {
+            const token = jwt.sign(
                 { user: username },
                 'helloworld',
-                {
-                    expiresIn:"1h"
-                }
-            )
+                { expiresIn: "1h" }
+            );
+
             req.session.token = token;
             req.session.userid = username;
-            
-            finalUsername = username;
-            // session.token = token;
-            // session.userid = username;
 
-            if(req.session.redirectdocument){
+            if (req.session.redirectdocument) {
                 return res.redirect(req.session.redirectdocument);
             } else {
-            return res.redirect('/')
-
+                return res.redirect('/');
             }
+        } else {
+            return res.status(401).json({ error: 'Invalid username or password' });
         }
-    })
-})
+    } catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ error: 'An error occurred during login' });
+    }
+});
 
 app.get('/signup', (req, res) => {
     //res.sendFile('signup.html', { root: path.join(__dirname, './views')})
