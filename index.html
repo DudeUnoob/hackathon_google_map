@@ -16,7 +16,7 @@
     </style>
   </head>
   <body>
-    <h3>My Google Maps Demo</h3>
+    <h3>Urban Watch</h3>
     <div id="map"></div>
     <button onclick="createNewMarker()">Create a New Marker</button>
     <button onclick="removeLastMarker()">Remove Last Marker</button>
@@ -44,10 +44,13 @@
           gmpDraggable: true,
           title: "Initial marker",
         });
-
+        initialMarker.name = "Initial marker";
+        initialMarker.description = "This is the initial marker";
         markers.push(initialMarker);
-
         initialMarker.addListener("dragend", (event) => {
+          updateInfoWindow(initialMarker);
+        });
+        initialMarker.addListener("click", () => {
           updateInfoWindow(initialMarker);
         });
       }
@@ -58,14 +61,23 @@
           return;
         }
 
+        const name = prompt("Enter a name for the marker:");
+        if (name === null) return; // User cancelled the prompt
+
+        const description = prompt("Enter a description for the marker:");
+        if (description === null) return; // User cancelled the prompt
+
         const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
         const newMarker = new AdvancedMarkerElement({
           map,
-          position: { lat: 29.7604, lng: -95.3698 },
+          position: map.getCenter(),
           gmpDraggable: true,
-          title: "New draggable marker",
+          title: name,
         });
+
+        newMarker.name = name;
+        newMarker.description = description;
 
         markers.push(newMarker);
 
@@ -73,6 +85,11 @@
           updateInfoWindow(newMarker);
         });
 
+        newMarker.addListener("click", () => {
+          updateInfoWindow(newMarker);
+        });
+
+        updateInfoWindow(newMarker);
         map.panTo(newMarker.position);
       }
 
@@ -85,6 +102,7 @@
           console.log("No markers to remove");
         }
       }
+
       function clearAllMarkers(){
         markers.forEach(marker => marker.map = null);
         markers = [];
@@ -94,12 +112,17 @@
       function updateInfoWindow(marker) {
         const position = marker.position;
         infoWindow.close();
-        infoWindow.setContent(`Pin dropped at: ${position.lat}, ${position.lng}`);
+        const content = `
+          <strong>${marker.name}</strong><br>
+          ${marker.description}<br>
+          Pin dropped at: ${position.lat}, ${position.lng}
+        `;
+        infoWindow.setContent(content);
         infoWindow.open(marker.map, marker);
       }
 
       initMap();
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=API_KEY&callback=initMap"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6XvjRnSbCvqsI9gSV0B9BrfIh3vCjRBU&callback=initMap"></script>
   </body>
 </html>
