@@ -137,9 +137,23 @@ app.get('/logout', auth, (req, res) => {
         let latitude= req.body.markers[0].lat
         let longitude = req.body.markers[0].lng 
 
-         await markersdb.create({ username: req.session.userid, lat: latitude, lng: longitude })
+        await markersdb.create({ username: req.session.userid, lat: latitude, lng: longitude })
 
         return res.status(200).json({ message: "Successfully created a new marker entry" })
+    }
+
+    catch(error) {
+        return res.status(500).json({ message: error, code: 500 })
+    }
+ })
+
+
+ app.get('/api/getMarkers', continueFlow, async(req, res) => {
+
+    try {
+
+        const returnData = await markersdb.find({ })
+        return res.status(200).json({ data: returnData })
     }
 
     catch(error) {

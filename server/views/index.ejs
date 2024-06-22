@@ -29,7 +29,6 @@
 
       async function initMap() {
         const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
         
         map = new Map(document.getElementById("map"), {
           center: { lat: 37.39094933041195, lng: -122.02503913145092 },
@@ -39,84 +38,110 @@
         
         infoWindow = new InfoWindow();
         
-        const initialMarker = new AdvancedMarkerElement({
-          map,
-          position: { lat: 37.39094933041195, lng: -122.02503913145092 },
-          gmpDraggable: true,
-          title: "Initial marker",
+        // Fetch markers from the API and render them
+        fetchAndRenderMarkers();
+        fetchAndRenderMarkers()
+      }
+
+      async function fetchAndRenderMarkers() {
+        try {
+          const response = await fetch('/api/getMarkers', {
+            method: "GET",
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          const data = await response.json();
+          console.log(data)
+          renderMarkers(data);
+        } catch (error) {
+          console.error('Error fetching markers:', error);
+        }
+      }
+
+      async function renderMarkers(markersData) {
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+        markersData.data.forEach(markerData => {
+          const marker = new AdvancedMarkerElement({
+            map,
+            position: { lat: markerData.lat, lng: markerData.lng },
+            gmpDraggable: true,
+            title: `Marker by ${markerData.username}`,
+          });
+
+          markers.push(marker);
+
+          marker.addListener("click", () => {
+            infoWindow.close();
+            infoWindow.setContent(`<div>Created by: ${markerData.username}<br>Position: ${markerData.lat}, ${markerData.lng}</div>`);
+            infoWindow.open(marker.map, marker);
+          });
+
+          marker.addListener("dragend", (event) => {
+            const position = marker.position;
+            console.log(`Marker moved to: ${position.lat}, ${position.lng}`);
+            updateMarkerPosition(marker, markerData.username);
+          });
         });
-
-        markers.push(initialMarker);
-
-        initialMarker.addListener("dragend", (event) => {
-  const position = initialMarker.position;
-  console.log(`Marker moved to: ${position.lat}, ${position.lng}`);
-
-  fetch("/api/updateMarkers", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      markers: [{lat: position.lat, lng: position.lng}]
-    })
-  }).then(res => res.json())
-    .then(data => console.log(data))
-
-  updateInfoWindow(initialMarker);
-});
       }
 
       async function createNewMarker() {
-  if (!map) {
-    console.error("Map not initialized");
-    return;
-  }
+        if (!map) {
+          console.error("Map not initialized");
+          return;
+        }
 
-  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+        const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-  const newMarker = new AdvancedMarkerElement({
-    map,
-    position: { lat: 37.7870889413597, lng: -122.42503913145092 },
-    gmpDraggable: true,
-    title: "New draggable marker",
-  });
+        const username = "test"; // You might want to get this from the current user's session
 
-  markers.push(newMarker);
+        const newMarker = new AdvancedMarkerElement({
+          map,
+          position: { lat: 37.7870889413597, lng: -122.42503913145092 },
+          gmpDraggable: true,
+          title: `Marker by ${username}`,
+        });
 
-  // Add event listener for dragend
-  newMarker.addListener("dragend", (event) => {
-    const position = newMarker.position;
-    console.log(`Marker moved to: ${position.lat}, ${position.lng}`);
+        markers.push(newMarker);
 
-    updateMarkerPosition(newMarker);
-  });
+        newMarker.addListener("click", () => {
+          infoWindow.close();
+          infoWindow.setContent(`<div>Created by: ${username}<br>Position: ${newMarker.position.lat}, ${newMarker.position.lng}</div>`);
+          infoWindow.open(newMarker.map, newMarker);
+        });
 
-  // Call the fetch function when a new marker is created
-  updateMarkerPosition(newMarker);
+        newMarker.addListener("dragend", (event) => {
+          const position = newMarker.position;
+          console.log(`Marker moved to: ${position.lat}, ${position.lng}`);
+          updateMarkerPosition(newMarker, username);
+        });
 
-  map.panTo(newMarker.position);
-}
+        updateMarkerPosition(newMarker, username);
 
-// Create a separate function to update marker position
-function updateMarkerPosition(marker) {
-  const position = marker.position;
+        map.panTo(newMarker.position);
+      }
 
-  fetch("/api/updateMarkers", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      markers: [{lat: position.lat, lng: position.lng}]
-    })
-  })
-  .then(res => res.json())
-  .then(data => console.log(data))
-  .catch(error => console.error('Error:', error));
+      function updateMarkerPosition(marker, username) {
+        const position = marker.position;
 
-  updateInfoWindow(marker);
-}
+        fetch("/api/updateMarkers", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            markers: [{lat: position.lat, lng: position.lng, username: username}]
+          })
+        })
+        .then(res => res.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+
+        infoWindow.close();
+        infoWindow.setContent(`<div>Created by: ${username}<br>Position: ${position.lat}, ${position.lng}</div>`);
+        infoWindow.open(marker.map, marker);
+      }
 
       function removeLastMarker() {
         if (markers.length > 0) {
@@ -132,13 +157,6 @@ function updateMarkerPosition(marker) {
         markers.forEach(marker => marker.map = null);
         markers = [];
         console.log("All markers have been cleared");
-      }
-
-      function updateInfoWindow(marker) {
-        const position = marker.position;
-        infoWindow.close();
-        infoWindow.setContent(`Pin dropped at: ${position.lat}, ${position.lng}`);
-        infoWindow.open(marker.map, marker);
       }
 
       initMap();
