@@ -1,26 +1,71 @@
 <!doctype html>
 <html>
   <head>
-    <title>Add and Remove Markers</title>
+    <title>Pollution Patrol</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <style>
       #map {
         height: 400px;
         width: 100%;
-      }
+      } 
       html, body {
         height: 100%;
         margin: 0;
         padding: 0;
       }
+
+      #map {
+      height: 70vh;
+      width: 100%;
+    }
+
+    body {
+      text-align: center;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: "Inter";
+      font-weight: bold;
+      background-color: #1e1e1e;
+    }
+
+    h3 {
+      font-size: 4vh;
+      color: white;
+      margin-top: 4vh;
+    }
+
+    .buttons {
+        height: 5vh;
+        width: 8vw;
+        margin-top: 4vh;
+        margin-left: 0.5vw;
+        margin-right: 0.5vw;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 1.25vh;
+        color: white;
+        background-color: #303030;
+        border: none;
+        padding-left: 0.5vw;
+        padding-right: 0.5vw;
+    }
+
+    .buttonDiv {
+      display: flex;
+      justify-content: center;
+    } 
     </style>
   </head>
   <body>
-    <h3>My Google Maps Demo</h3>
+    <h3>Pollution Patrol</h3>
     <div id="map"></div>
-    <button onclick="createNewMarker()">Create a New Marker</button>
-    <button onclick="removeUserMarker()">Remove My Last Marker</button>
-    <button onclick="clearAllMarkers()">Clear All Markers</button>
+    <button onclick="createNewMarker()" class="buttons">Create a New Marker</button>
+    <button onclick="removeUserMarker()" class="buttons">Remove My Last Marker</button>
+    <button onclick="clearAllMarkers()" class="buttons">Clear All Markers</button>
 
     <script>
       let map;
